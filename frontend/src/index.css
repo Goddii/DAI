@@ -1,0 +1,174 @@
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-sans/700.css";
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Canvas: app background (very light blue-gray) */
+  --color-canvas: #f3f5f9;
+  --color-surface: #ffffff;
+
+  /* Ink: neutral navy-slate text scale */
+  --color-ink-950: #101828;
+  --color-ink-900: #1a2333;
+  --color-ink-700: #344054;
+  --color-ink-500: #667085;
+  --color-ink-400: #8592a5;
+  --color-ink-300: #98a2b3;
+  --color-ink-200: #d0d5dd;
+
+  /* Line: dividers and borders */
+  --color-line: #e4e7ec;
+
+  /* Brand: calm, trustworthy navy/blue (distinct from Tailwind indigo) */
+  --color-brand-50: #f0f5fc;
+  --color-brand-100: #dde8f7;
+  --color-brand-200: #c2d7f0;
+  --color-brand-300: #97bce5;
+  --color-brand-400: #669ad7;
+  --color-brand-500: #447cc8;
+  --color-brand-600: #3363b4;
+  --color-brand-700: #2b5095;
+  --color-brand-800: #28457c;
+  --color-brand-900: #253b66;
+  --color-brand-950: #17254a;
+
+  /* Positive: paid / settled / synced only */
+  --color-positive-50: #e9f7ef;
+  --color-positive-100: #d2efdf;
+  --color-positive-600: #1f8a5b;
+  --color-positive-700: #157347;
+
+  /* Attention: pending sync / needs attention */
+  --color-attention-50: #fdf3e3;
+  --color-attention-100: #fae7c4;
+  --color-attention-600: #c47a1f;
+  --color-attention-700: #9a5b13;
+
+  /* Danger: destructive actions / serious errors (sparingly) */
+  --color-danger-50: #fdebea;
+  --color-danger-100: #fad7d4;
+  --color-danger-600: #d92d20;
+  --color-danger-700: #b42318;
+
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-pop: 0 4px 6px -2px rgb(16 24 40 / 0.06), 0 12px 24px -6px rgb(16 24 40 / 0.12);
+  --shadow-docked: 0 -8px 32px rgb(16 24 40 / 0.12);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink-900 font-sans antialiased;
+    font-feature-settings: "cv11";
+  }
+
+  /* Tabular numerals for every amount — money must never jitter */
+  .tnum {
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background: var(--color-brand-200);
+    color: var(--color-brand-950);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  dialog {
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: none;
+    max-height: none;
+    color: inherit;
+  }
+
+  dialog::backdrop {
+    background: rgb(16 24 40 / 0.45);
+  }
+
+  dialog[open] .sheet-panel {
+    animation: sheet-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  dialog[open] .sheet-panel.sheet-desktop {
+    animation: sheet-in-desktop 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes sheet-in-desktop {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in {
+    animation: fade-in 150ms ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Safe-area helpers for phones with notches/gesture bars */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Hide number input spinners (AmountInput uses text input + numeric keypad) */
+  input.no-spinner::-webkit-outer-spin-button,
+  input.no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
