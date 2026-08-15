@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dai-db
+    environment:
+      POSTGRES_USER: dai
+      POSTGRES_PASSWORD: dai
+      POSTGRES_DB: dai
+    ports:
+      - "5432:5432"
+    # Data lives in the container filesystem. For durable storage, uncomment:
+    # volumes:
+    #   - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dai -d dai"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
