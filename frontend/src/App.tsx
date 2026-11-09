@@ -6,6 +6,7 @@ import { Skeleton } from './components/ui/Skeleton'
 import { CustomerDetailPage } from './pages/CustomerDetailPage'
 import { CustomersPage } from './pages/CustomersPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { EmailVerificationPage } from './pages/EmailVerificationPage'
 import { LoginPage } from './pages/LoginPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { AuthProvider, useAuth } from './store/AuthProvider'
@@ -34,6 +35,10 @@ function Shell() {
         <Skeleton className="h-16 w-full rounded-2xl" />
       </div>
     )
+  }
+
+  if (new URLSearchParams(location.search).has('verify_email_token')) {
+    return <EmailVerificationPage />
   }
 
   if (!trader) return <LoginPage />

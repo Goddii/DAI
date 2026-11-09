@@ -10,6 +10,7 @@ import re
 from app.errors import bad_request
 
 PHONE_RE = re.compile(r"^\+?[0-9]{9,15}$")
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def require_fields(data: dict, *fields: str) -> None:
@@ -34,6 +35,19 @@ def validate_name(value, field: str = "name", max_len: int = 120) -> str:
             code="invalid_" + field,
         )
     return text
+
+
+def validate_email(value, *, optional: bool = False) -> str | None:
+    if value is None or value == "":
+        if optional:
+            return None
+        raise bad_request("Please enter your email address.", code="invalid_email")
+    if not isinstance(value, str):
+        raise bad_request("Please enter a valid email address.", code="invalid_email")
+    email = value.strip().lower()
+    if len(email) > 255 or not EMAIL_RE.fullmatch(email):
+        raise bad_request("Please enter a valid email address.", code="invalid_email")
+    return email
 
 
 def validate_optional_text(value, field: str, max_len: int = 255) -> str | None:

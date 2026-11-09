@@ -31,6 +31,7 @@ class Trader(db.Model):
     # Phone is the login identifier. Normalized before storage (digits, optional leading +).
     phone = db.Column(db.String(20), nullable=False, unique=True, index=True)
     email = db.Column(db.String(255), nullable=True)
+    email_verified = db.Column(db.Boolean, nullable=False, default=False)
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(
         db.DateTime(timezone=True), nullable=False, default=utcnow
@@ -48,6 +49,39 @@ class Trader(db.Model):
     ledger_entries = db.relationship(
         "LedgerEntry", back_populates="trader", cascade="all, delete-orphan"
     )
+
+
+class PasswordResetToken(db.Model):
+    __tablename__ = "password_reset_tokens"
+
+    id = db.Column(db.Integer, primary_key=True)
+    trader_id = db.Column(
+        db.Integer,
+        db.ForeignKey("traders.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    token_hash = db.Column(db.String(64), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
+    expires_at = db.Column(db.DateTime(timezone=True), nullable=False)
+    used_at = db.Column(db.DateTime(timezone=True), nullable=True)
+
+
+class EmailVerificationToken(db.Model):
+    __tablename__ = "email_verification_tokens"
+
+    id = db.Column(db.Integer, primary_key=True)
+    trader_id = db.Column(
+        db.Integer,
+        db.ForeignKey("traders.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    email = db.Column(db.String(255), nullable=False)
+    token_hash = db.Column(db.String(64), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
+    expires_at = db.Column(db.DateTime(timezone=True), nullable=False)
+    used_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
 
 class Customer(db.Model):

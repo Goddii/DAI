@@ -77,6 +77,25 @@ class Config:
         ).split(",")
         if o.strip()
     ]
+    SMTP_HOST = os.environ.get("SMTP_HOST")
+    SMTP_PORT = _int_env("SMTP_PORT", 587)
+    SMTP_USER = os.environ.get("SMTP_USER")
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
+    SMTP_FROM = os.environ.get("SMTP_FROM")
+    SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "true").strip().lower() == "true"
+    SMTP_USE_SSL = os.environ.get("SMTP_USE_SSL", "false").strip().lower() == "true"
+    SMTP_TIMEOUT_SECONDS = _int_env("SMTP_TIMEOUT_SECONDS", 10)
+    FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+    PASSWORD_RESET_RATE_LIMIT = _int_env("PASSWORD_RESET_RATE_LIMIT", 5)
+    PASSWORD_RESET_RATE_WINDOW_SECONDS = _int_env(
+        "PASSWORD_RESET_RATE_WINDOW_SECONDS", 900
+    )
+    PASSWORD_RESET_CONFIRM_RATE_LIMIT = _int_env(
+        "PASSWORD_RESET_CONFIRM_RATE_LIMIT", 10
+    )
+    PASSWORD_RESET_CONFIRM_RATE_WINDOW_SECONDS = _int_env(
+        "PASSWORD_RESET_CONFIRM_RATE_WINDOW_SECONDS", 300
+    )
 
 
 class TestConfig(Config):

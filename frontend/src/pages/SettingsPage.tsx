@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { RefreshCw, TriangleAlert } from 'lucide-react'
+import { ApiError, api } from '../lib/api'
 import { Header } from '../components/layout/Header'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
+import { Input } from '../components/ui/Input'
 import { Skeleton } from '../components/ui/Skeleton'
 import { getPendingOps, type OutboxOp } from '../lib/db'
 import { formatKsh } from '../lib/money'
@@ -14,10 +16,19 @@ export function SettingsPage() {
   const { online, pendingCount, syncing, lastSyncAt, syncAll } = useSync()
   const [failedOps, setFailedOps] = useState<OutboxOp[]>([])
   const [busy, setBusy] = useState(false)
+  const [recoveryEmail, setRecoveryEmail] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [emailBusy, setEmailBusy] = useState(false)
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [emailNotice, setEmailNotice] = useState<string | null>(null)
 
   useEffect(() => {
     void loadFailed()
   }, [pendingCount, online, syncing])
+
+  useEffect(() => {
+    setRecoveryEmail(trader?.email ?? '')
+  }, [trader?.email])
 
   async function loadFailed() {
     const ops = await getPendingOps()
@@ -31,6 +42,29 @@ export function SettingsPage() {
       await loadFailed()
     } finally {
       setBusy(false)
+    }
+  }
+
+  async function requestEmailVerification(e: React.FormEvent) {
+    e.preventDefault()
+    setEmailBusy(true)
+    setEmailError(null)
+    setEmailNotice(null)
+    try {
+      const { message } = await api.requestEmailVerification(
+        recoveryEmail.trim(),
+        currentPassword,
+      )
+      setEmailNotice(message)
+      setCurrentPassword('')
+    } catch (err) {
+      setEmailError(
+        err instanceof ApiError
+          ? err.message
+          : 'We could not update your recovery email. Please try again.',
+      )
+    } finally {
+      setEmailBusy(false)
     }
   }
 
@@ -51,6 +85,51 @@ export function SettingsPage() {
           ) : (
             <Skeleton className="mt-3 h-10 w-48" />
           )}
+        </section>
+
+        <section className="rounded-2xl border border-line bg-surface p-5">
+          <h2 className="text-[13px] font-semibold uppercase tracking-wide text-ink-400">
+            Password recovery
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-ink-500">
+            {trader?.email_verified
+              ? 'Your recovery email is verified.'
+              : trader?.email
+                ? 'Verify your email before it can be used to reset your password.'
+                : 'Add and verify an email so you can reset your password if you forget it.'}
+          </p>
+          <form onSubmit={(e) => void requestEmailVerification(e)} className="mt-4 space-y-3">
+            <Input
+              label="Recovery email"
+              type="email"
+              value={recoveryEmail}
+              onChange={(e) => setRecoveryEmail(e.target.value)}
+              placeholder="you@example.com"
+              autoComplete="email"
+              required
+            />
+            <Input
+              label="Current password"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+            {emailError ? (
+              <p role="alert" className="rounded-xl bg-danger-50 px-4 py-3 text-sm text-danger-700">
+                {emailError}
+              </p>
+            ) : null}
+            {emailNotice ? (
+              <p role="status" className="rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">
+                {emailNotice}
+              </p>
+            ) : null}
+            <Button type="submit" fullWidth disabled={emailBusy}>
+              {emailBusy ? 'Please wait…' : 'Send verification link'}
+            </Button>
+          </form>
         </section>
 
         {/* Sync status — automatic; nothing for the trader to press here. */}

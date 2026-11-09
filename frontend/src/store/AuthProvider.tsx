@@ -5,8 +5,9 @@ import { clearAllLocalData } from '../lib/db'
 interface AuthState {
   trader: Trader | null
   ready: boolean
+  refreshTrader: () => Promise<void>
   login: (phone: string, password: string) => Promise<void>
-  register: (name: string, phone: string, password: string) => Promise<void>
+  register: (name: string, phone: string, password: string, email?: string) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -62,14 +63,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       trader,
       ready,
+      refreshTrader: async () => {
+        const { trader: fresh } = await api.me()
+        localStorage.setItem(TRADER_KEY, JSON.stringify(fresh))
+        setTrader(fresh)
+      },
       login: async (phone, password) => {
         const { token, trader: t } = await api.login({ phone, password })
         setToken(token)
         localStorage.setItem(TRADER_KEY, JSON.stringify(t))
         setTrader(t)
       },
-      register: async (name, phone, password) => {
-        const { token, trader: t } = await api.register({ name, phone, password })
+      register: async (name, phone, password, email) => {
+        const { token, trader: t } = await api.register({ name, phone, password, email })
         setToken(token)
         localStorage.setItem(TRADER_KEY, JSON.stringify(t))
         setTrader(t)

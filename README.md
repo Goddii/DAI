@@ -106,6 +106,16 @@ the deployed frontend URL. There is no auto-seeding — the demo trader
 (`0700000000` / `dai12345`) exists only when created explicitly with
 `flask --app run.py seed`.
 
+Password reset links are sent over SMTP. Set `SMTP_HOST`, `SMTP_PORT`,
+`SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, and `FRONTEND_URL` in Render.
+Password reset requests are rate-limited; reset links expire after 30 minutes
+and can be used once.
+Port 587 uses STARTTLS by default; for implicit TLS (usually port 465), set
+`SMTP_USE_SSL=true` and `SMTP_USE_TLS=false`. Keep SMTP credentials in Render
+environment variables, never in the frontend or source control. Users can add
+an email during signup or later in Settings; the address must be verified
+before it can receive password reset links.
+
 ### Frontend — Vercel
 
 `frontend/vercel.json` provides the SPA fallback (direct navigation to

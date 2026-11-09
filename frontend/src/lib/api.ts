@@ -33,6 +33,7 @@ export interface Trader {
   name: string
   phone: string
   email: string | null
+  email_verified?: boolean
 }
 
 export interface CustomerDto {
@@ -117,10 +118,27 @@ function json(method: string, body?: unknown): RequestInit {
 }
 
 export const api = {
-  register: (payload: { name: string; phone: string; password: string }) =>
+  register: (payload: { name: string; phone: string; password: string; email?: string }) =>
     request<{ token: string; trader: Trader }>('/auth/register', json('POST', payload)),
   login: (payload: { phone: string; password: string }) =>
     request<{ token: string; trader: Trader }>('/auth/login', json('POST', payload)),
+  requestPasswordReset: (email: string) =>
+    request<{ message: string }>('/auth/password-reset/request', json('POST', { email })),
+  requestEmailVerification: (email: string, password: string) =>
+    request<{ message: string }>(
+      '/auth/email-verification/request',
+      json('POST', { email, password }),
+    ),
+  confirmEmailVerification: (token: string) =>
+    request<{ message: string }>(
+      '/auth/email-verification/confirm',
+      json('POST', { token }),
+    ),
+  resetPassword: (token: string, password: string) =>
+    request<{ message: string }>(
+      '/auth/password-reset/confirm',
+      json('POST', { token, password }),
+    ),
   logout: () => request<void>('/auth/logout', json('POST')),
   me: () => request<{ trader: Trader }>('/auth/me'),
 
