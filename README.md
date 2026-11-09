@@ -116,6 +116,15 @@ environment variables, never in the frontend or source control. Users can add
 an email during signup or later in Settings; the address must be verified
 before it can receive password reset links.
 
+### Manually migrating Neon (Render free plan)
+
+Render's free web services don't run a pre-deploy migration command. To apply
+database migrations without Render Shell, add a GitHub Actions repository
+secret named `NEON_DATABASE_URL` with the Neon connection string, then open
+**Actions → Migrate Neon database → Run workflow**. The workflow applies
+`flask db upgrade` and reports the current Alembic revision. Never put the
+connection string in workflow files or commit it to the repository.
+
 ### Frontend — Vercel
 
 `frontend/vercel.json` provides the SPA fallback (direct navigation to
