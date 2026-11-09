@@ -5,7 +5,7 @@
 # After creation:
 #   1. Replace CORS_ORIGINS below with the deployed frontend URL
 #      (e.g. https://dai.vercel.app).
-#   2. Set DATABASE_URL in the Render dashboard to the Supabase PostgreSQL
+#   2. Set DATABASE_URL in the Render dashboard to the Neon PostgreSQL
 #      connection string (postgresql://... — postgres:// is also accepted and
 #      normalized). It is an externally supplied secret: never commit it.
 #   3. The migrations run automatically in the pre-deploy (release) step —
